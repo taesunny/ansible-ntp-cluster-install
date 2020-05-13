@@ -1,0 +1,56 @@
+- name: install ntp for clients
+  hosts: clients
+  vars:
+  remote_user: root
+  become: true
+  tasks:
+    - name: Update apt-get
+      apt:
+        update-cache: yes
+      tags: ntp
+    - name: Install ntp
+      apt:
+        name: ntp
+        state: latest
+      tags: ntp
+    - name: Set ntp
+      template:
+        src: templates/ntp.client.conf.j2
+        dest: /etc/ntp.conf
+      tags: ntp
+    - name: Register ntp for auto start
+      service:
+        name: ntp
+        state: restarted
+      tags: ntp
+    - name: Set timezone to Asia/Seoul
+      timezone:
+        name: Asia/Seoul
+- name: install ntp for server (master) for internal network
+  hosts: servers
+  vars:
+  remote_user: root
+  become: true
+  tasks:
+    - name: Update apt-get
+      apt:
+        update-cache: yes
+      tags: ntp
+    - name: Install ntp
+      apt:
+        name: ntp
+        state: latest
+      tags: ntp
+    - name: Set ntp
+      template:
+        src: templates/ntp.server.remote.conf.j2
+        dest: /etc/ntp.conf
+      tags: ntp
+    - name: Register ntp for auto start
+      service:
+        name: ntp
+        state: restarted
+      tags: ntp
+    - name: Set timezone to Asia/Seoul
+      timezone:
+        name: Asia/Seoul
